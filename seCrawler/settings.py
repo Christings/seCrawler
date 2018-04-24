@@ -18,7 +18,7 @@ ITEM_PIPELINES = {'seCrawler.pipelines.SespiderPipeline': 1}
 
 USER_AGENT = "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.93 Safari/537.36"
 
-DEPTH_LIMIT = 1
+DEPTH_LIMIT = 3
 
 
 

@@ -1,4 +1,8 @@
 __author__ = 'Lilly'
+
+import scrapy
+import re
+import json
 from scrapy.spiders import Spider
 from seCrawler.common.searResultPages import searResultPages
 from seCrawler.common.searchEngines import SearchEngineResultSelectors
@@ -25,6 +29,23 @@ class keywordSpider(Spider):
             print("url:", url)
             self.start_urls.append(url)
 
+    # def parse(self, response):
+    #     for url in Selector(response).xpath(self.selector).extract():
+    #         yield scrapy.Request(url, self.parse_text)
+    #         # yield {'url': url}
+    #
+    def parse_text(self, response):
+        text=response.body.decode('gb2312','ignore')  # 把结果解析为中文的格式来显示
+        pattarn = re.compile(r'<[^>]+>', re.S)
+        content = pattarn.sub('', text)
+        print(content)
+        #
+        # title=response.meta['title']
+        # with open(r'files/' + response.meta['title'] + '.txt', 'w',encoding='utf-8') as file:
+        #     file.write(str(content).decode('utf-8'))
+        #     print(file.read())
+        #     file.close()
+
     def parse(self, response):
         item = KeywordspiderItem()
         # a 用来解决IndexError: list index out of range越界的问题
@@ -36,13 +57,16 @@ class keywordSpider(Spider):
                 if each.xpath('./@id').extract() in a:
                     item['title'] = (''.join(each.xpath('./h3/a//text()').extract()).strip())
                     item['url'] = each.xpath('./h3/a/@href').extract()[0]
+                    # item['time']=each.xpath('./div[@class="c-abstract"]/span/text()').extract(0)
                     item['abstract'] = (''.join(each.xpath('./div[@class="c-abstract"]//text()').extract())).replace(
                         ',',
                         '').strip()
+                    print('111', item['url'])
                     # for url in Selector(response).xpath(self.selector).extract():
                     #     # yield {'url':url}  不使用item，直接存储到txt文件中。
                     #     item['url'] = url
                     #     yield item
+                    yield scrapy.Request(item['url'], meta={'title': item['title']}, callback=self.parse_text)
                 yield item
         elif self.searchEngine == 'google':
             for each in Selector(response).xpath(self.selector):
@@ -64,4 +88,3 @@ class keywordSpider(Spider):
                     item['abstract'] = (''.join(each.xpath('./div[@class="b_caption"]/p//text()').extract()))
                     print(item['abstract'])
                 yield item
-        pass
