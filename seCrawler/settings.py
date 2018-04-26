@@ -20,8 +20,6 @@ USER_AGENT = "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, lik
 
 DEPTH_LIMIT = 3
 
-
-
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = 'seCrawler (+http://www.yourdomain.com)'
 
@@ -90,3 +88,8 @@ DEPTH_LIMIT = 3
 # HTTPCACHE_DIR='httpcache'
 # HTTPCACHE_IGNORE_HTTP_CODES=[]
 # HTTPCACHE_STORAGE='scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+# 数据库配置
+MONGO_HOST = '127.0.0.1'
+MONGO_PORT = 27017
+MONGO_DB = 'search'
