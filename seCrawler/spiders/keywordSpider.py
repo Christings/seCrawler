@@ -4,9 +4,6 @@
 __author__ = 'Lilly'
 
 import scrapy
-import re
-import json
-import codecs
 from scrapy.spiders import Spider
 from seCrawler.common.searResultPages import searResultPages
 from seCrawler.common.searchEngines import SearchEngineResultSelectors
@@ -39,20 +36,20 @@ class keywordSpider(Spider):
     #         # yield {'url': url}
     #
     def parse_text(self, response):
-        text = response.body.decode('utf-8','ignore')  # 把结果解析为中文的格式来显示
-        with open(r'files/' + response.meta['title'] + '.txt', 'w',encoding='utf-8') as file:
+        text = response.body.decode('utf-8', 'ignore')  # 把结果解析为中文的格式来显示
+        with open(r'files/' + response.meta['title'] + '.txt', 'w', encoding='utf-8') as file:
             file.write(text)
             file.close()
-        # pattarn = re.compile(r'<[^>]+>', re.S)
-        # content = pattarn.sub('', text)
-        # text = response.body
-        #
-        # with open(r'files/' + response.meta['title'] + '.txt', 'w', encoding='utf-8') as file:
-        #     file.write(str(text))
-        #     file.close()
-        #     # with open(r'files/' + response.meta['title'] + '.txt', 'wb') as file:
-        #     #     file.write(text.encode(encoding='gb18030', errors='ignore'))
-        #     #     file.close()
+            # pattarn = re.compile(r'<[^>]+>', re.S)
+            # content = pattarn.sub('', text)
+            # text = response.body
+            #
+            # with open(r'files/' + response.meta['title'] + '.txt', 'w', encoding='utf-8') as file:
+            #     file.write(str(text))
+            #     file.close()
+            #     # with open(r'files/' + response.meta['title'] + '.txt', 'wb') as file:
+            #     #     file.write(text.encode(encoding='gb18030', errors='ignore'))
+            #     #     file.close()
 
     def parse(self, response):
         item = KeywordspiderItem()
@@ -63,19 +60,15 @@ class keywordSpider(Spider):
         if self.searchEngine == 'baidu':
             for each in Selector(response).xpath(self.selector):
                 if each.xpath('./@id').extract() in a:
-                    item['title'] = (''.join(each.xpath('./h3/a//text()').extract())).replace('|', '').replace('?','').strip()
+                    item['title'] = (''.join(each.xpath('./h3/a//text()').extract())).replace('|', '').replace('?',
+                                                                                                               '').strip()
                     item['url'] = each.xpath('./h3/a/@href').extract()[0]
-                    item['time'] = (''.join(each.xpath('./div[@class="c-abstract"]/span/text()').extract())).replace('\xa0-','').strip()
+                    item['time'] = (''.join(each.xpath('./div[@class="c-abstract"]/span/text()').extract())).replace(
+                        '\xa0-', '').strip()
                     item['abstract'] = (''.join(each.xpath('./div[@class="c-abstract"]//text()').extract())).replace(
                         ',',
                         '').strip()
-                    print('111', item['url'])
-                    # for url in Selector(response).xpath(self.selector).extract():
-                    #     # yield {'url':url}  不使用item，直接存储到txt文件中。
-                    #     item['url'] = url
-                    #     yield item
                     url = item['url']
-                    # title = item['title'].replace('|', '').replace('?','')
                     yield scrapy.Request(url, meta={'title': item['title']}, callback=self.parse_text)
                 yield item
         elif self.searchEngine == 'google':
